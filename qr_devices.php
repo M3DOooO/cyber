@@ -53,7 +53,7 @@ select,button{padding:8px;font-size:14px}
 </form>
 
 <?php if($selected_device_id > 0 && $selected_device_name != ''){ 
-$url = $hostUrl.'/qr_device_order.php?device_id='.$selected_device_id;
+$url = $hostUrl.'/device_order_qr.php?device_id='.$selected_device_id;
 $qr='https://quickchart.io/qr?size=260&text='.urlencode($url);
 ?>
 <div class="card">
