@@ -22,6 +22,17 @@ if ($db_ok) {
     if (!mysql_query($create_sql)) {
         $db_ok = false;
     }
+
+    // مهم: CREATE TABLE IF NOT EXISTS لا يضيف الأعمدة في الجداول القديمة.
+    // لذلك نتأكد أن عمود qty موجود حتى لا يفشل INSERT في البيئات القديمة.
+    if ($db_ok) {
+        $qty_col = mysql_query("SHOW COLUMNS FROM qr_device_requests LIKE 'qty'");
+        if ($qty_col && mysql_num_rows($qty_col) == 0) {
+            if (!mysql_query("ALTER TABLE qr_device_requests ADD COLUMN qty INT NOT NULL DEFAULT 1 AFTER request_type")) {
+                $db_ok = false;
+            }
+        }
+    }
 }
 
 $device_id = isset($_GET['device_id']) ? (int)$_GET['device_id'] : 0;
@@ -70,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($insert) {
                 $success_message = '✅ تم إرسال الطلب بنجاح.';
             } else {
-                $error_message = 'تعذر إرسال الطلب حاليا. حاول مرة أخرى.';
+                $error_message = 'تعذر إرسال الطلب حاليا. حاول مرة أخرى. ('.mysql_error().')';
             }
     }
 }

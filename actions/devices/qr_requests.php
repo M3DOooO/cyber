@@ -26,6 +26,11 @@ if (!$create_ok) {
     echo json_encode(array('ok' => false, 'error' => 'db_table'));
     exit;
 }
+// توافق مع قواعد بيانات قديمة: أضف qty إذا كان الجدول موجود بدون هذا العمود.
+$qty_col = mysql_query("SHOW COLUMNS FROM qr_device_requests LIKE 'qty'");
+if ($qty_col && mysql_num_rows($qty_col) == 0) {
+    mysql_query("ALTER TABLE qr_device_requests ADD COLUMN qty INT NOT NULL DEFAULT 1 AFTER request_type");
+}
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 if ($action == 'count') {
     $c = mysql_query("SELECT COUNT(*) AS c FROM qr_device_requests WHERE status='new'");
