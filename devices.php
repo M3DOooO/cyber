@@ -323,7 +323,13 @@ else
 
 <div id="content" class="span10">
 <!-- content starts -->
-<div style="margin:10px 0"><a class="btn btn-info" href="devices_qr.php" target="_blank">QR Codes للأجهزة</a></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0">
+  <a class="btn btn-info" href="devices_qr.php" target="_blank">QR Codes للأجهزة</a>
+  <div style="position:relative">
+    <button class="btn btn-warning" id="qrNotifBtn" onclick="toggleQrBox()">طلبات QR <span id="qrNotifCount" class="badge badge-important">0</span></button>
+    <div id="qrNotifBox" style="display:none;position:absolute;right:0;top:40px;background:#fff;border:1px solid #ccc;padding:10px;width:320px;z-index:9999;max-height:340px;overflow:auto"></div>
+  </div>
+</div>
 
 <?php 
 
@@ -997,5 +1003,35 @@ else if($user_shift == '1')
 
 
 
+
+<script>
+function toggleQrBox(){
+  var b=document.getElementById('qrNotifBox');
+  if(b.style.display==='none'){b.style.display='block';loadQrList();}else{b.style.display='none';}
+}
+function closeQrReq(id){
+  $.get('actions/devices/qr_requests.php?action=close&id='+id,function(){loadQrCount();loadQrList();});
+}
+function loadQrCount(){
+  $.getJSON('actions/devices/qr_requests.php?action=count',function(r){
+    if(r&&r.ok){ $('#qrNotifCount').text(r.count); }
+  });
+}
+function loadQrList(){
+  $.getJSON('actions/devices/qr_requests.php?action=list',function(r){
+    var box=$('#qrNotifBox');
+    if(!r||!r.ok){ box.html('تعذر تحميل الطلبات'); return; }
+    if(!r.items.length){ box.html('لا يوجد طلبات جديدة'); return; }
+    var h='';
+    for(var i=0;i<r.items.length;i++){
+      var it=r.items[i];
+      h += '<div style="border-bottom:1px solid #eee;padding:6px 0"><b>'+it.device_name+'</b><br>المنتج: '+it.request_type+' | الكمية: '+(it.qty||1)+'<br><button class="btn btn-mini" onclick="closeQrReq('+it.id+')">تم التنفيذ</button></div>';
+    }
+    box.html(h);
+  });
+}
+setInterval(loadQrCount,10000);
+$(function(){ loadQrCount(); });
+</script>
 </body>
 </html>

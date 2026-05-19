@@ -49,13 +49,17 @@ select,button{padding:8px;font-size:14px}
 </form>
 
 <?php if($selected_device_id > 0 && $selected_device_name != ''){
-$qr_text = 'Device ID: '.$selected_device_id.' | Device Name: '.$selected_device_name;
-$qr='https://quickchart.io/qr?size=260&text='.urlencode($qr_text);
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+$base_path = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+$order_url = $scheme.'://'.$host.$base_path.'/device_order_qr.php?device_id='.(int)$selected_device_id;
+$qr='https://quickchart.io/qr?size=260&text='.urlencode($order_url);
 ?>
 <div class="card">
     <b><?php echo htmlspecialchars($selected_device_name);?></b><br><br>
     <img src="<?php echo $qr;?>" width="220" height="220" alt="QR"><br>
-    <small>ID: <?php echo (int)$selected_device_id;?></small>
+    <small>ID: <?php echo (int)$selected_device_id;?></small><br>
+    <small dir="ltr"><?php echo htmlspecialchars($order_url);?></small>
 </div>
 <?php } else { ?>
 <p>لا يوجد أجهزة متاحة.</p>
