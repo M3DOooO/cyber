@@ -1,16 +1,14 @@
 <?php
-// Temporary debug mode for this page to diagnose HTTP 500 errors.
+// QR page bootstrap fixes:
+// 1) define legacy variable expected by includes/config.php to avoid undefined-variable warnings
+// 2) keep visible error output for diagnosis without converting every warning to fatal exception
+if (!isset($mac)) {
+    $mac = '';
+}
+
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-
-set_error_handler(function ($severity, $message, $file, $line) {
-    if (!(error_reporting() & $severity)) {
-        return false;
-    }
-
-    throw new ErrorException($message, 0, $severity, $file, $line);
-});
 
 register_shutdown_function(function () {
     $error = error_get_last();
