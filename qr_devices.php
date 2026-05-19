@@ -7,13 +7,9 @@ mysql_connect("$host", "$user", "$pass") or die('DB Connection Error');
 mysql_select_db("$db") or die('DB Select Error');
 
 $selected_device_id = isset($_GET['device_id']) ? (int)$_GET['device_id'] : 0;
-$hostUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-
 $devices = array();
 $res = mysql_query("SELECT ID, `Device Name` FROM devices ORDER BY orderby");
-while ($row = mysql_fetch_assoc($res)) {
-    $devices[] = $row;
-}
+while ($row = mysql_fetch_assoc($res)) { $devices[] = $row; }
 
 if ($selected_device_id <= 0 && count($devices) > 0) {
     $selected_device_id = (int)$devices[0]['ID'];
@@ -41,7 +37,7 @@ select,button{padding:8px;font-size:14px}
 </head>
 <body>
 <div class="wrap">
-<h2>QR لكل جهاز (طلبات خارجية)</h2>
+<h2>QR للأجهزة</h2>
 <form method="get" class="sel">
 <label>اختار الروم / الجهاز:</label><br><br>
 <select name="device_id" onchange="this.form.submit()">
@@ -52,9 +48,9 @@ select,button{padding:8px;font-size:14px}
 <noscript><button type="submit">عرض</button></noscript>
 </form>
 
-<?php if($selected_device_id > 0 && $selected_device_name != ''){ 
-$url = $hostUrl.'/device_order_qr.php?device_id='.$selected_device_id;
-$qr='https://quickchart.io/qr?size=260&text='.urlencode($url);
+<?php if($selected_device_id > 0 && $selected_device_name != ''){
+$qr_text = 'Device ID: '.$selected_device_id.' | Device Name: '.$selected_device_name;
+$qr='https://quickchart.io/qr?size=260&text='.urlencode($qr_text);
 ?>
 <div class="card">
     <b><?php echo htmlspecialchars($selected_device_name);?></b><br><br>
