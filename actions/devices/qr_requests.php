@@ -17,6 +17,7 @@ $create_ok = mysql_query("CREATE TABLE IF NOT EXISTS qr_device_requests (
     device_id INT NOT NULL,
     device_name VARCHAR(255) NOT NULL,
     request_type VARCHAR(255) NOT NULL,
+    qty INT NOT NULL DEFAULT 1,
     status VARCHAR(20) NOT NULL DEFAULT 'new',
     created_at DATETIME NOT NULL
 )");
@@ -26,6 +27,13 @@ if (!$create_ok) {
     exit;
 }
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
+if ($action == 'count') {
+    $c = mysql_query("SELECT COUNT(*) AS c FROM qr_device_requests WHERE status='new'");
+    $row = $c ? mysql_fetch_assoc($c) : array('c'=>0);
+    header('Content-Type: application/json');
+    echo json_encode(array('ok' => true, 'count' => (int)$row['c']));
+    exit;
+}
 if ($action == 'close') {
     $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
     mysql_query("UPDATE qr_device_requests SET status='closed' WHERE id='".$id."'");
