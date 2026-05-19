@@ -323,7 +323,7 @@ else
 
 <div id="content" class="span10">
 <!-- content starts -->
-<div style="margin:10px 0"><a class="btn btn-info" href="qr_devices.php" target="_blank">QR Codes للأجهزة</a></div>
+<div style="margin:10px 0"><a class="btn btn-info" href="devices_qr.php" target="_blank">QR Codes للأجهزة</a></div>
 
 <?php 
 
