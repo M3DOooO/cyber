@@ -323,6 +323,7 @@ else
 
 <div id="content" class="span10">
 <!-- content starts -->
+<div style="margin:10px 0"><a class="btn btn-info" href="devices_qr.php" target="_blank">QR Codes للأجهزة</a></div>
 
 <?php 
 
@@ -992,6 +993,28 @@ else if($user_shift == '1')
 <script src="js/jquery.history.js"></script>
 <!-- application script for Charisma demo -->
 <script src="js/charisma.js"></script>
+
+
+<style>
+#qr-requests-box{position:fixed;top:15px;right:15px;width:300px;z-index:9999;background:#fff;border:1px solid #ccc;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+#qr-requests-box h4{margin:0;padding:10px;background:#2d89ef;color:#fff;border-radius:8px 8px 0 0;font-size:14px}
+#qr-requests-list{max-height:260px;overflow:auto;padding:8px}
+.qr-item{background:#f7f7f7;border:1px solid #ddd;border-radius:6px;padding:8px;margin-bottom:8px;position:relative;font-size:13px}
+.qr-close{position:absolute;left:8px;top:5px;cursor:pointer;color:#c00;font-weight:bold}
+</style>
+<div id="qr-requests-box"><h4>طلبات QR الخارجية</h4><div id="qr-requests-list"><div style="color:#888">لا توجد طلبات حاليا</div></div></div>
+<script>
+(function(){
+var seen = {};
+function beep(){try{var c=new (window.AudioContext||window.webkitAudioContext)();var o=c.createOscillator();var g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=900;o.type='sine';g.gain.value=0.05;o.start();setTimeout(function(){o.stop();c.close();},180);}catch(e){}}
+function render(items){var box=document.getElementById('qr-requests-list'); if(!items.length){box.innerHTML='<div style="color:#888">لا توجد طلبات حاليا</div>'; return;} var h='';
+for(var i=0;i<items.length;i++){var it=items[i];if(!seen[it.id]){beep();seen[it.id]=1;}h+='<div class="qr-item"><span class="qr-close" onclick="closeQrReq('+it.id+')">✖</span><b>جهاز: '+it.device_name+'</b><br>الطلب: '+it.request_type+'</div>';}
+box.innerHTML=h;}
+window.closeQrReq=function(id){$.get('actions/devices/qr_requests.php?action=close&id='+id,function(){loadReq();});}
+function loadReq(){$.getJSON('actions/devices/qr_requests.php',function(d){if(d&&d.ok){render(d.items||[]);}});}
+setInterval(loadReq,5000);loadReq();
+})();
+</script>
 
 </body>
 </html>
