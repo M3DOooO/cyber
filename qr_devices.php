@@ -2,13 +2,68 @@
 session_start();
 if (!isset($_SESSION['ps_user'])) { include('login.php'); die(); }
 include('includes/config.php');
-mysql_connect("$host", "$user", "$pass") or die('db');
-mysql_select_db("$db") or die('db');
+
+mysql_connect("$host", "$user", "$pass") or die('DB Connection Error');
+mysql_select_db("$db") or die('DB Select Error');
+
+$selected_device_id = isset($_GET['device_id']) ? (int)$_GET['device_id'] : 0;
 $hostUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+
+$devices = array();
 $res = mysql_query("SELECT ID, `Device Name` FROM devices ORDER BY orderby");
-?><!doctype html><html><head><meta charset="utf-8"><title>QR الأجهزة</title><style>body{font-family:tahoma;direction:rtl;padding:15px}.card{display:inline-block;width:220px;border:1px solid #ddd;border-radius:8px;padding:10px;margin:8px;text-align:center}</style></head><body>
+while ($row = mysql_fetch_assoc($res)) {
+    $devices[] = $row;
+}
+
+if ($selected_device_id <= 0 && count($devices) > 0) {
+    $selected_device_id = (int)$devices[0]['ID'];
+}
+
+$selected_device_name = '';
+foreach ($devices as $d) {
+    if ((int)$d['ID'] === $selected_device_id) {
+        $selected_device_name = $d['Device Name'];
+        break;
+    }
+}
+?><!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>QR الأجهزة</title>
+<style>
+body{font-family:tahoma;direction:rtl;padding:15px}
+.wrap{max-width:560px;margin:0 auto}
+.sel{margin:15px 0;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fafafa}
+.card{width:260px;border:1px solid #ddd;border-radius:8px;padding:12px;margin:10px auto;text-align:center}
+select,button{padding:8px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
 <h2>QR لكل جهاز (طلبات خارجية)</h2>
-<?php while($d=mysql_fetch_assoc($res)){ $url=$hostUrl.'/qr_device_order.php?device_id='.$d['ID']; $qr='https://quickchart.io/qr?size=200&text='.urlencode($url); ?>
-<div class="card"><b><?php echo htmlspecialchars($d['Device Name']);?></b><br><img src="<?php echo $qr;?>" width="170" height="170"><br><small>ID: <?php echo (int)$d['ID'];?></small></div>
+<form method="get" class="sel">
+<label>اختار الروم / الجهاز:</label><br><br>
+<select name="device_id" onchange="this.form.submit()">
+<?php foreach($devices as $d){ ?>
+<option value="<?php echo (int)$d['ID'];?>" <?php if((int)$d['ID']===$selected_device_id){echo 'selected';}?>><?php echo htmlspecialchars($d['Device Name']);?></option>
 <?php } ?>
-</body></html>
+</select>
+<noscript><button type="submit">عرض</button></noscript>
+</form>
+
+<?php if($selected_device_id > 0 && $selected_device_name != ''){ 
+$url = $hostUrl.'/qr_device_order.php?device_id='.$selected_device_id;
+$qr='https://quickchart.io/qr?size=260&text='.urlencode($url);
+?>
+<div class="card">
+    <b><?php echo htmlspecialchars($selected_device_name);?></b><br><br>
+    <img src="<?php echo $qr;?>" width="220" height="220" alt="QR"><br>
+    <small>ID: <?php echo (int)$selected_device_id;?></small>
+</div>
+<?php } else { ?>
+<p>لا يوجد أجهزة متاحة.</p>
+<?php } ?>
+</div>
+</body>
+</html>

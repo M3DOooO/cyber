@@ -6,16 +6,25 @@ if (!isset($_SESSION['ps_user'])) {
     exit;
 }
 include('../../includes/config.php');
-mysql_connect("$host", "$user", "$pass") or die('db');
-mysql_select_db("$db") or die('db');
-mysql_query("CREATE TABLE IF NOT EXISTS qr_device_requests (
+$conn = mysql_connect("$host", "$user", "$pass");
+if (!$conn || !mysql_select_db("$db")) {
+    header('Content-Type: application/json');
+    echo json_encode(array('ok' => false, 'error' => 'db_connection'));
+    exit;
+}
+$create_ok = mysql_query("CREATE TABLE IF NOT EXISTS qr_device_requests (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     device_id INT NOT NULL,
     device_name VARCHAR(255) NOT NULL,
     request_type VARCHAR(255) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'new',
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME NOT NULL
 )");
+if (!$create_ok) {
+    header('Content-Type: application/json');
+    echo json_encode(array('ok' => false, 'error' => 'db_table'));
+    exit;
+}
 $action = isset($_GET['action']) ? $_GET['action'] : 'list';
 if ($action == 'close') {
     $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
