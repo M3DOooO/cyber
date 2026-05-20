@@ -1065,7 +1065,7 @@ function loadQrList(){
     var h='';
     for(var i=0;i<r.items.length;i++){
       var it=r.items[i];
-      h += '<div style="border-bottom:1px solid #eee;padding:6px 0"><b>'+it.device_name+'</b><br>المنتج: '+it.request_type+' | الكمية: '+(it.qty||1)+'<br><button class="btn btn-mini" onclick="closeQrReq('+it.id+')">تم التنفيذ</button></div>';
+      h += '<div style="border-bottom:1px solid #eee;padding:6px 0"><b>'+it.device_name+'</b><br>المنتج: '+it.request_type+'<br>الكمية: '+(it.qty||1)+'<br><button class="btn btn-mini" onclick="closeQrReq('+it.id+')">تم التنفيذ</button></div>';
     }
     box.html(h);
   });

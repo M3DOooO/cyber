@@ -13,6 +13,7 @@ if (!$conn || !mysql_select_db("$db")) {
     exit;
 }
 mysql_set_charset('utf8mb4');
+mysql_query("SET NAMES utf8mb4");
 $create_ok = mysql_query("CREATE TABLE IF NOT EXISTS qr_device_requests (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     device_id INT NOT NULL,
@@ -22,6 +23,7 @@ $create_ok = mysql_query("CREATE TABLE IF NOT EXISTS qr_device_requests (
     status VARCHAR(20) NOT NULL DEFAULT 'new',
     created_at DATETIME NOT NULL
 )");
+mysql_query("ALTER TABLE qr_device_requests CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
 if (!$create_ok) {
     header('Content-Type: application/json; charset=UTF-8');
     echo json_encode(array('ok' => false, 'error' => 'db_table'), JSON_UNESCAPED_UNICODE);
