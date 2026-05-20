@@ -142,7 +142,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $session_id = (int)$device_state['session_id'];
                     mysql_query("INSERT INTO `ps_orders` (`catagory`, `sub_cat`,`name`, `price`, `num` , `ps_id` ,`session_id`,`day`,`month`,`year`,`shift`,`hour` ) VALUES ('$cat', '$sub_cat', '$name','$total','$posted_qty','$device_id','$session_id','$shift_day','$shift_month','$year','$current_shift','$hour')");
                 }
-                $success_message = '✅ تم إرسال الطلب بنجاح وتم إضافته لطلبات الجهاز.';
+                header("Location: device_order_qr.php?device_id=".$device_id."&pin=".urlencode($provided_pin)."&done=1");
+                exit;
             } else {
                 $error_message = 'تعذر إرسال الطلب حاليا. حاول مرة أخرى. ('.mysql_error().')';
             }
@@ -153,13 +154,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($db_ok && $device_id > 0 && $device_qr_pin !== '' && $provided_pin === $device_qr_pin) {
     if (isset($_GET['switch_mode'])) {
         $next_mode = ($_GET['switch_mode'] === 'multi') ? 'multi' : 'single';
-        mysql_query("UPDATE devices SET qr_order_mode='".$next_mode."' WHERE ID='".$device_id."'");
-        $device_qr_mode = $next_mode;
+        $safe_name = mysql_real_escape_string($device_name);
+        $mode_text = ($next_mode === 'multi') ? 'طلب تحويل من Single إلى Multi' : 'طلب تحويل من Multi إلى Single';
+        $safe_mode_text = mysql_real_escape_string($mode_text);
+        mysql_query("INSERT INTO qr_device_requests (device_id,device_name,request_type,qty,status,created_at) VALUES ('".$device_id."','$safe_name','$safe_mode_text','1','new',NOW())");
+        header("Location: device_order_qr.php?device_id=".$device_id."&pin=".urlencode($provided_pin)."&done=1");
+        exit;
     }
     if (isset($_GET['switch_time'])) {
         $next_time = ($_GET['switch_time'] === 'unlimited') ? 'unlimited' : 'time';
-        mysql_query("UPDATE devices SET timetype='".$next_time."' WHERE ID='".$device_id."'");
-        $device_time_mode = $next_time;
+        $safe_name = mysql_real_escape_string($device_name);
+        $time_text = ($next_time === 'unlimited') ? 'طلب تحويل الوقت إلى غير محدود' : 'طلب تحويل الوقت إلى محدود';
+        $safe_time_text = mysql_real_escape_string($time_text);
+        mysql_query("INSERT INTO qr_device_requests (device_id,device_name,request_type,qty,status,created_at) VALUES ('".$device_id."','$safe_name','$safe_time_text','1','new',NOW())");
+        header("Location: device_order_qr.php?device_id=".$device_id."&pin=".urlencode($provided_pin)."&done=1");
+        exit;
     }
 }
 

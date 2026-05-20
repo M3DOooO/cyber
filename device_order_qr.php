@@ -10,6 +10,25 @@ error_reporting(E_ALL);
 
 $device_id = isset($_GET['device_id']) ? (int)$_GET['device_id'] : 0;
 $pin = isset($_REQUEST['pin']) ? trim($_REQUEST['pin']) : '';
+$done = isset($_GET['done']) ? (int)$_GET['done'] : 0;
+
+if ($done === 1) {
+?>
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>تم الإرسال</title>
+</head>
+<body style="background:#fff;font-family:tahoma;direction:rtl;padding:40px;text-align:center">
+    <h2 style="color:#177d2f">✅ تم إرسال الطلب بنجاح</h2>
+    <p>شكراً لك، تم استلام الطلب.</p>
+</body>
+</html>
+<?php
+    exit;
+}
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $pin === '') {
 ?>
