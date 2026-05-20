@@ -71,7 +71,7 @@ if ($db_ok && $device_id > 0) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $posted_type = isset($_POST['request_type']) ? trim($_POST['request_type']) : '';
-    $posted_qty = isset($_POST['qty']) ? (int)$_POST['qty'] : 1;
+    $posted_qty = 1;
 
     if (!$db_ok) {
         $error_message = 'حصلت مشكلة في قاعدة البيانات. برجاء المحاولة مرة أخرى.';
@@ -80,8 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($posted_type == '') {
         $error_message = 'من فضلك اختار نوع الطلب.';
     } else {
-        if ($posted_qty < 1) { $posted_qty = 1; }
-        if ($posted_qty > 50) { $posted_qty = 50; }
         $request_type = mysql_real_escape_string($posted_type);
         $safe_name = mysql_real_escape_string($device_name);
         $insert = mysql_query("INSERT INTO qr_device_requests (device_id,device_name,request_type,qty,status,created_at) VALUES ('".$device_id."','$safe_name','$request_type','".$posted_qty."','new',NOW())");
