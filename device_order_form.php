@@ -7,7 +7,11 @@ if (!$conn) {
     $db_ok = false;
 } elseif (!mysql_select_db("$db")) {
     $db_ok = false;
+} else {
+    mysql_set_charset('utf8mb4');
+    mysql_query("SET NAMES utf8mb4");
 }
+
 
 if ($db_ok) {
     $create_sql = "CREATE TABLE IF NOT EXISTS qr_device_requests (
@@ -21,6 +25,9 @@ if ($db_ok) {
     )";
     if (!mysql_query($create_sql)) {
         $db_ok = false;
+    }
+    if ($db_ok) {
+        mysql_query("ALTER TABLE qr_device_requests CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     }
 
     // مهم: CREATE TABLE IF NOT EXISTS لا يضيف الأعمدة في الجداول القديمة.
@@ -124,9 +131,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <select name="request_type" style="width:100%;padding:10px;margin-bottom:12px" required>
 <option value="">-- اختار المنتج --</option>
 <?php foreach($stock_items as $it){ ?>
-<option value="<?php echo htmlspecialchars($it['name']);?>"><?php echo htmlspecialchars($it['name']);?> (متاح: <?php echo (int)$it['qty_left'];?>)</option>
+<option value="<?php echo htmlspecialchars($it['name']);?>"><?php echo htmlspecialchars($it['name']);?></option>
 <?php } ?>
 </select>
+<label style="display:block;margin-bottom:6px">الكمية المطلوبة:</label>
 <input type="number" name="qty" min="1" max="50" value="1" style="width:100%;padding:10px;margin-bottom:12px" placeholder="الكمية" required>
 <button type="submit">إرسال الطلب</button>
 </form>
