@@ -324,7 +324,7 @@ else
 <div id="content" class="span10">
 <!-- content starts -->
 <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0">
-  <a class="btn btn-info" href="devices_qr.php" target="_blank">QR Codes للأجهزة</a>
+  <a class="btn btn-info" href="qr_devices.php" target="_blank">QR Codes للأجهزة</a>
   <div style="position:relative">
     <button class="btn btn-warning" id="qrNotifBtn" onclick="toggleQrBox()">طلبات QR <span id="qrNotifCount" class="badge badge-important">0</span></button>
     <div id="qrNotifBox" style="display:none;position:absolute;right:0;top:40px;background:#fff;border:1px solid #ccc;padding:10px;width:320px;z-index:9999;max-height:340px;overflow:auto"></div>
