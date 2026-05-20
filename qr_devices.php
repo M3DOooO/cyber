@@ -29,10 +29,16 @@ foreach ($devices as $d) {
 <title>QR الأجهزة</title>
 <style>
 body{font-family:tahoma;direction:rtl;padding:15px}
-.wrap{max-width:560px;margin:0 auto}
+.wrap{max-width:700px;margin:0 auto}
 .sel{margin:15px 0;padding:10px;border:1px solid #ddd;border-radius:8px;background:#fafafa}
-.card{width:260px;border:1px solid #ddd;border-radius:8px;padding:12px;margin:10px auto;text-align:center}
+.card{width:420px;border:1px solid #ddd;border-radius:8px;padding:16px;margin:10px auto;text-align:center;background:#fff}
 select,button{padding:8px;font-size:14px}
+.print-btn{display:inline-block;margin-top:12px;background:#2d89ef;color:#fff;padding:8px 14px;border-radius:6px;text-decoration:none}
+@media print{
+  .sel,h2,.print-btn{display:none}
+  body{padding:0}
+  .card{border:0;box-shadow:none;margin:0 auto}
+}
 </style>
 </head>
 <body>
@@ -57,9 +63,9 @@ $qr='https://quickchart.io/qr?size=260&text='.urlencode($order_url);
 ?>
 <div class="card">
     <b><?php echo htmlspecialchars($selected_device_name);?></b><br><br>
-    <img src="<?php echo $qr;?>" width="220" height="220" alt="QR"><br>
+    <img src="<?php echo $qr;?>" width="360" height="360" alt="QR"><br>
     <small>ID: <?php echo (int)$selected_device_id;?></small><br>
-    <small dir="ltr"><?php echo htmlspecialchars($order_url);?></small>
+    <a href="#" class="print-btn" onclick="window.print();return false;">طباعة الصورة</a>
 </div>
 <?php } else { ?>
 <p>لا يوجد أجهزة متاحة.</p>
