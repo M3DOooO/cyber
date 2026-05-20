@@ -88,42 +88,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($posted_type == '') {
         $error_message = 'من فضلك اختار نوع الطلب.';
     } else {
-        $request_type = mysql_real_escape_string($posted_type);
-        $safe_name = mysql_real_escape_string($device_name);
-        $insert = mysql_query("INSERT INTO qr_device_requests (device_id,device_name,request_type,qty,status,created_at) VALUES ('".$device_id."','$safe_name','$request_type','".$posted_qty."','new',NOW())");
+        if ($posted_qty < 1) { $posted_qty = 1; }
+        if ($posted_qty > 50) { $posted_qty = 50; }
+
+        $device_state_res = mysql_query("SELECT `session_id`, `Device Status` FROM devices WHERE ID='".$device_id."' LIMIT 1");
+        $device_state = $device_state_res ? mysql_fetch_assoc($device_state_res) : false;
+        if (!$device_state || $device_state['Device Status'] != 'On' || (int)$device_state['session_id'] <= 0) {
+            $error_message = 'الجهاز غير متاح حاليا. برجاء فتح وقت من الكاشير قبل بدء الطلب.';
+        } else {
+            $request_type = mysql_real_escape_string($posted_type);
+            $safe_name = mysql_real_escape_string($device_name);
+            $insert = mysql_query("INSERT INTO qr_device_requests (device_id,device_name,request_type,qty,status,created_at) VALUES ('".$device_id."','$safe_name','$request_type','".$posted_qty."','new',NOW())");
             if ($insert) {
-                $order_sent_to_device = false;
-                $device_res = mysql_query("SELECT `session_id`, `Device Status` FROM devices WHERE ID='".$device_id."' LIMIT 1");
                 $stock_res = mysql_query("SELECT `catagory`,`sub_cat`,`price` FROM stock WHERE name='".$request_type."' LIMIT 1");
-                if ($device_res && $stock_res) {
-                    $drow = mysql_fetch_assoc($device_res);
-                    $srow = mysql_fetch_assoc($stock_res);
-                    if ($drow && $srow && $drow['Device Status'] == 'On' && (int)$drow['session_id'] > 0) {
-                        $cfg = mysql_query("SELECT `current_shift`,`shift_day`,`shift_month` FROM config LIMIT 1");
-                        $c = $cfg ? mysql_fetch_assoc($cfg) : false;
-                        $current_shift = $c ? $c['current_shift'] : '';
-                        $shift_day = $c ? (int)$c['shift_day'] : (int)date('d');
-                        $shift_month = $c ? (int)$c['shift_month'] : (int)date('m');
-                        $year = (int)date('Y');
-                        $hour = (int)date('H');
-                        $unit_price = (float)$srow['price'];
-                        $total = $unit_price * $posted_qty;
-                        $cat = mysql_real_escape_string($srow['catagory']);
-                        $sub_cat = mysql_real_escape_string($srow['sub_cat']);
-                        $name = mysql_real_escape_string($posted_type);
-                        $session_id = (int)$drow['session_id'];
-                        $ps_insert = mysql_query("INSERT INTO `ps_orders` (`catagory`, `sub_cat`,`name`, `price`, `num` , `ps_id` ,`session_id`,`day`,`month`,`year`,`shift`,`hour` ) VALUES ('$cat', '$sub_cat', '$name','$total','$posted_qty','$device_id','$session_id','$shift_day','$shift_month','$year','$current_shift','$hour')");
-                        if ($ps_insert) { $order_sent_to_device = true; }
-                    }
+                $srow = $stock_res ? mysql_fetch_assoc($stock_res) : false;
+                if ($srow) {
+                    $cfg = mysql_query("SELECT `current_shift`,`shift_day`,`shift_month` FROM config LIMIT 1");
+                    $c = $cfg ? mysql_fetch_assoc($cfg) : false;
+                    $current_shift = $c ? $c['current_shift'] : '';
+                    $shift_day = $c ? (int)$c['shift_day'] : (int)date('d');
+                    $shift_month = $c ? (int)$c['shift_month'] : (int)date('m');
+                    $year = (int)date('Y');
+                    $hour = (int)date('H');
+                    $unit_price = (float)$srow['price'];
+                    $total = $unit_price * $posted_qty;
+                    $cat = mysql_real_escape_string($srow['catagory']);
+                    $sub_cat = mysql_real_escape_string($srow['sub_cat']);
+                    $name = mysql_real_escape_string($posted_type);
+                    $session_id = (int)$device_state['session_id'];
+                    mysql_query("INSERT INTO `ps_orders` (`catagory`, `sub_cat`,`name`, `price`, `num` , `ps_id` ,`session_id`,`day`,`month`,`year`,`shift`,`hour` ) VALUES ('$cat', '$sub_cat', '$name','$total','$posted_qty','$device_id','$session_id','$shift_day','$shift_month','$year','$current_shift','$hour')");
                 }
-                if ($order_sent_to_device) {
-                    $success_message = '✅ تم إرسال الطلب بنجاح وتم إضافته لطلبات الجهاز.';
-                } else {
-                    $success_message = '✅ تم إرسال الطلب بنجاح (تنبيه: الجهاز غير مفتوح حالياً أو تعذر إضافته مباشرة لطلبات الجهاز).';
-                }
+                $success_message = '✅ تم إرسال الطلب بنجاح وتم إضافته لطلبات الجهاز.';
             } else {
                 $error_message = 'تعذر إرسال الطلب حاليا. حاول مرة أخرى. ('.mysql_error().')';
             }
+        }
     }
 }
 
