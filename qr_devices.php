@@ -8,7 +8,8 @@ mysql_select_db("$db") or die('DB Select Error');
 
 $selected_device_id = isset($_GET['device_id']) ? (int)$_GET['device_id'] : 0;
 $devices = array();
-$res = mysql_query("SELECT ID, `Device Name` FROM devices ORDER BY orderby");
+@mysql_query("ALTER TABLE devices ADD COLUMN qr_access_code VARCHAR(20) NOT NULL DEFAULT ''");
+$res = mysql_query("SELECT ID, `Device Name`, qr_access_code FROM devices ORDER BY orderby");
 while ($row = mysql_fetch_assoc($res)) { $devices[] = $row; }
 
 if ($selected_device_id <= 0 && count($devices) > 0) {
@@ -16,9 +17,11 @@ if ($selected_device_id <= 0 && count($devices) > 0) {
 }
 
 $selected_device_name = '';
+$selected_qr_code = ''; 
 foreach ($devices as $d) {
     if ((int)$d['ID'] === $selected_device_id) {
         $selected_device_name = $d['Device Name'];
+        $selected_qr_code = isset($d['qr_access_code']) ? $d['qr_access_code'] : '';
         break;
     }
 }
@@ -58,13 +61,14 @@ select,button{padding:8px;font-size:14px}
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 $base_path = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
-$order_url = $scheme.'://'.$host.$base_path.'/device_order_qr.php?device_id='.(int)$selected_device_id;
+$order_url = $scheme.'://'.$host.$base_path.'/device_order_qr.php?device_id='.(int)$selected_device_id.'&pin='.urlencode($selected_qr_code);
 $qr='https://quickchart.io/qr?size=260&text='.urlencode($order_url);
 ?>
 <div class="card">
     <b><?php echo htmlspecialchars($selected_device_name);?></b><br><br>
     <img src="<?php echo $qr;?>" width="360" height="360" alt="QR"><br>
     <small>ID: <?php echo (int)$selected_device_id;?></small><br>
+    <small>كود الطلب الحالي: <b><?php echo htmlspecialchars($selected_qr_code);?></b></small><br>
     <a href="#" class="print-btn" onclick="window.print();return false;">طباعة الصورة</a>
 </div>
 <?php } else { ?>

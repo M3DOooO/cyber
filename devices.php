@@ -5,6 +5,10 @@ if( !isset($_SESSION['ps_user']) )
 	die();
 }
 include('includes/config.php');
+
+@mysql_query("ALTER TABLE devices ADD COLUMN qr_access_code VARCHAR(20) NOT NULL DEFAULT ''");
+@mysql_query("ALTER TABLE devices ADD COLUMN qr_order_mode VARCHAR(10) NOT NULL DEFAULT 'single'");
+
 if($lang == 'en'){include('languages/en.php');}else if($lang == 'ar'){include('languages/ar.php');}
 $casheer = $_SESSION['ps_user'];
 $close = $_GET['action']; 
@@ -166,6 +170,8 @@ if($socket) {  // if it returns a file pointer
 		mysql_query("UPDATE `devices` set `second` = '$Second'  WHERE `id` = '$id';");  
 		mysql_query("UPDATE `devices` set `Device Status` = 'On'  WHERE `id` = '$id';");  
 		mysql_query("UPDATE `devices` set `session_id` = '$sess'  WHERE `id` = '$id';");  
+		$qr_access_code = str_pad((string)rand(0, 999999), 6, '0', STR_PAD_LEFT);
+		mysql_query("UPDATE `devices` set `qr_access_code` = '$qr_access_code'  WHERE `id` = '$id';");
 		mysql_query("UPDATE `devices` set `timetype` = 'unlimited'  WHERE `id` = '$id';");  
 
 		mysql_query("INSERT INTO `reports` (`type`, `pc_id`, `Start_hour` ,`Start_minute`,`session_id`,`day`,`day2`,`month`,`year`,`Start_second`,`shift`) VALUES ('$value1', '$id','$H','$Minute','$sess','$shift_day','$Day2','$shift_month','$Year','$Second','$current_shift');"); 
@@ -207,6 +213,8 @@ if($socket) {  // if it returns a file pointer
 		mysql_query("UPDATE `devices` set `second` = '$Second'  WHERE `id` = '$id';");  
 		mysql_query("UPDATE `devices` set `Device Status` = 'On'  WHERE `id` = '$id';");  
 		mysql_query("UPDATE `devices` set `session_id` = '$sess'  WHERE `id` = '$id';");  
+		$qr_access_code = str_pad((string)rand(0, 999999), 6, '0', STR_PAD_LEFT);
+		mysql_query("UPDATE `devices` set `qr_access_code` = '$qr_access_code'  WHERE `id` = '$id';");
 		mysql_query("UPDATE `devices` set `timetype` = 'time'  WHERE `id` = '$id';");  
 		mysql_query("UPDATE `devices` set `end_m` = '$new_m'  WHERE `id` = '$id';");  
 		mysql_query("UPDATE `devices` set `end_h` = '$new_h'  WHERE `id` = '$id';");  
@@ -218,6 +226,7 @@ if(isset($finishedid))
 {
  
 	mysql_query("UPDATE `devices` set `Device Status` = 'finished'  WHERE `id` = '$finishedid';"); 
+	mysql_query("UPDATE `devices` set `qr_access_code` = '' WHERE `id` = '$finishedid';");
 }
  
 $sql="SELECT * FROM config";
@@ -1041,6 +1050,14 @@ function playQrSound(){
   } catch(e) {}
 }
 
+
+function setQrMode(deviceId, mode){
+  $.get('actions/devices/qr_requests.php?action=set_mode&device_id='+deviceId+'&mode='+mode,function(){ loadQrList(); });
+}
+function setQrStatus(deviceId, status){
+  $.get('actions/devices/qr_requests.php?action=set_status&device_id='+deviceId+'&status='+status,function(){ loadQrList(); loadQrCount(); });
+}
+
 function loadQrCount(){
   $.getJSON('actions/devices/qr_requests.php?action=count',function(r){
     if(!(r&&r.ok)){ return; }
@@ -1065,7 +1082,7 @@ function loadQrList(){
     var h='';
     for(var i=0;i<r.items.length;i++){
       var it=r.items[i];
-      h += '<div style="border-bottom:1px solid #eee;padding:6px 0"><b>'+it.device_name+'</b><br>المنتج: '+it.request_type+'<br>الكمية: '+(it.qty||1)+'<br><button class="btn btn-mini" onclick="closeQrReq('+it.id+')">تم التنفيذ</button></div>';
+      h += '<div style="border-bottom:1px solid #eee;padding:6px 0"><b>'+it.device_name+'</b><br>المنتج: '+it.request_type+'<br>الكمية: '+(it.qty||1)+'<br><button class="btn btn-mini" onclick="closeQrReq('+it.id+')">تم التنفيذ</button> <button class="btn btn-mini" onclick="setQrMode('+it.device_id+',\'single\')">Single</button> <button class="btn btn-mini" onclick="setQrMode('+it.device_id+',\'multi\')">Multi</button> <button class="btn btn-mini" onclick="setQrStatus('+it.device_id+',\'On\')">فتح التايم</button> <button class="btn btn-mini" onclick="setQrStatus('+it.device_id+',\'finished\')">قفل التايم</button></div>';
     }
     box.html(h);
   });

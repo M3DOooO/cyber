@@ -49,6 +49,25 @@ if ($action == 'close') {
     echo json_encode(array('ok' => true), JSON_UNESCAPED_UNICODE);
     exit;
 }
+
+if ($action == 'set_mode') {
+    $device_id = isset($_GET['device_id']) ? (int)$_GET['device_id'] : 0;
+    $mode = isset($_GET['mode']) && $_GET['mode'] === 'multi' ? 'multi' : 'single';
+    @mysql_query("ALTER TABLE devices ADD COLUMN qr_order_mode VARCHAR(10) NOT NULL DEFAULT 'single'");
+    mysql_query("UPDATE devices SET qr_order_mode='".$mode."' WHERE ID='".$device_id."'");
+    header('Content-Type: application/json; charset=UTF-8');
+    echo json_encode(array('ok' => true), JSON_UNESCAPED_UNICODE);
+    exit;
+}
+if ($action == 'set_status') {
+    $device_id = isset($_GET['device_id']) ? (int)$_GET['device_id'] : 0;
+    $status = (isset($_GET['status']) && $_GET['status'] === 'On') ? 'On' : 'finished';
+    mysql_query("UPDATE devices SET `Device Status`='".$status."' WHERE ID='".$device_id."'");
+    header('Content-Type: application/json; charset=UTF-8');
+    echo json_encode(array('ok' => true), JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 $res = mysql_query("SELECT * FROM qr_device_requests WHERE status='new' ORDER BY id DESC LIMIT 20");
 $out = array();
 while($row = mysql_fetch_assoc($res)) { $out[] = $row; }

@@ -63,13 +63,23 @@ if ($db_ok) {
 
 
 $device_name = 'Unknown Device';
+$device_qr_pin = '';
+$device_qr_mode = 'single';
 $error_message = '';
 $success_message = '';
+$provided_pin = isset($_REQUEST['pin']) ? trim($_REQUEST['pin']) : '';
+
+if ($db_ok) {
+    @mysql_query("ALTER TABLE devices ADD COLUMN qr_access_code VARCHAR(20) NOT NULL DEFAULT ''");
+    @mysql_query("ALTER TABLE devices ADD COLUMN qr_order_mode VARCHAR(10) NOT NULL DEFAULT 'single'");
+}
 
 if ($db_ok && $device_id > 0) {
-    $r = mysql_query("SELECT `Device Name` FROM devices WHERE ID='".$device_id."' LIMIT 1");
+    $r = mysql_query("SELECT `Device Name`,`qr_access_code`,`qr_order_mode` FROM devices WHERE ID='".$device_id."' LIMIT 1");
     if ($r && ($row = mysql_fetch_assoc($r))) {
         $device_name = $row['Device Name'];
+        $device_qr_pin = isset($row['qr_access_code']) ? trim($row['qr_access_code']) : '';
+        $device_qr_mode = isset($row['qr_order_mode']) ? trim($row['qr_order_mode']) : 'single';
     } else {
         $error_message = 'الجهاز غير موجود.';
     }
@@ -85,6 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = 'حصلت مشكلة في قاعدة البيانات. برجاء المحاولة مرة أخرى.';
     } elseif ($device_id <= 0 || $device_name == 'Unknown Device') {
         $error_message = 'لا يمكن إرسال الطلب بدون جهاز صحيح.';
+    } elseif ($device_qr_pin === '' || $provided_pin !== $device_qr_pin) {
+        $error_message = 'الكود السري غير صحيح. اطلب QR محدث من الكاشير.';
     } elseif ($posted_type == '') {
         $error_message = 'من فضلك اختار نوع الطلب.';
     } else {
@@ -98,7 +110,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $request_type = mysql_real_escape_string($posted_type);
             $safe_name = mysql_real_escape_string($device_name);
-            $insert = mysql_query("INSERT INTO qr_device_requests (device_id,device_name,request_type,qty,status,created_at) VALUES ('".$device_id."','$safe_name','$request_type','".$posted_qty."','new',NOW())");
+            if ($device_qr_mode === 'single') {
+                $single_check = mysql_query("SELECT id FROM qr_device_requests WHERE device_id='".$device_id."' AND status='new' LIMIT 1");
+                if ($single_check && mysql_num_rows($single_check) > 0) {
+                    $error_message = 'الجهاز مضبوط على Single ويوجد طلب جديد بالفعل.';
+                }
+            }
+
+            $insert = false;
+            if ($error_message == '') {
+                $insert = mysql_query("INSERT INTO qr_device_requests (device_id,device_name,request_type,qty,status,created_at) VALUES ('".$device_id."','$safe_name','$request_type','".$posted_qty."','new',NOW())");
+            }
             if ($insert) {
                 $stock_res = mysql_query("SELECT `catagory`,`sub_cat`,`price` FROM stock WHERE name='".$request_type."' LIMIT 1");
                 $srow = $stock_res ? mysql_fetch_assoc($stock_res) : false;
@@ -132,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <style>body{font-family:tahoma;padding:20px;direction:rtl}.box{max-width:380px;margin:auto;border:1px solid #ddd;padding:18px;border-radius:10px}button{width:100%;padding:10px;background:#2d89ef;color:#fff;border:0;border-radius:8px}.err{color:#b30000}.ok{color:green}</style>
 </head><body><div class="box"><h3>جهاز: <?php echo htmlspecialchars($device_name);?></h3>
 <p>اختار المنتج من المخزن:</p>
-<form method="post" action="device_order_qr.php?device_id=<?php echo (int)$device_id; ?>">
+<form method="post" action="device_order_qr.php?device_id=<?php echo (int)$device_id; ?>&pin=<?php echo urlencode($provided_pin); ?>">
 <select name="request_type" style="width:100%;padding:10px;margin-bottom:12px" required>
 <option value="">-- اختار المنتج --</option>
 <?php foreach($stock_items as $it){ ?>
