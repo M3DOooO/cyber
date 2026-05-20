@@ -67,8 +67,6 @@ $qr='https://quickchart.io/qr?size=260&text='.urlencode($order_url);
 <div class="card">
     <b><?php echo htmlspecialchars($selected_device_name);?></b><br><br>
     <img src="<?php echo $qr;?>" width="360" height="360" alt="QR"><br>
-    <small>ID: <?php echo (int)$selected_device_id;?></small><br>
-    <small>كود الطلب الحالي: <b><?php echo htmlspecialchars($selected_qr_code);?></b></small><br>
     <a href="#" class="print-btn" onclick="window.print();return false;">طباعة الصورة</a>
 </div>
 <?php } else { ?>
