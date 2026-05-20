@@ -57,15 +57,16 @@ if(isset($lang_lo))
 	<meta name="author" content="Mohamed Gad">
 	<?php  include 'includes/css.php';?>
 	<style>
-		body{background:#f5f7fa;}
+		body{background:linear-gradient(140deg,#04070f 0%,#0a1d49 45%,#1668d2 100%);}
 		.simple-login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-		.simple-login-card{width:100%;max-width:420px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:22px;box-shadow:0 4px 14px rgba(0,0,0,.08)}
-		.simple-title{text-align:center;margin:0 0 8px;font-size:24px;line-height:1.5}
-		.simple-sub{text-align:center;color:#777;margin-bottom:16px}
-		.simple-input{width:100%;height:42px;border:1px solid #d1d5db;border-radius:8px;padding:0 12px;box-sizing:border-box}
-		.simple-row{margin-bottom:12px}
-		.simple-actions{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
-		.simple-btn{height:40px;padding:0 16px;border:0;border-radius:8px;background:#2d89ef;color:#fff}
+		.simple-login-card{width:100%;max-width:390px;background:rgba(9,15,34,.90);border:1px solid rgba(117,165,255,.35);border-radius:12px;padding:34px 20px;box-shadow:0 16px 34px rgba(0,0,0,.45)}
+		.simple-title{text-align:center;margin:0 0 8px;font-size:28px;line-height:1.5;color:#eaf2ff}
+		.simple-sub{text-align:center;color:#b8c7ea;margin-bottom:16px}
+		.simple-input{width:86%;height:56px;border:1px solid #5f79b8;border-radius:10px;padding:0 14px;box-sizing:border-box;background:#0f1e45;color:#fff}
+		.simple-row{margin-bottom:14px;display:flex;justify-content:center}
+		.simple-actions{display:flex;align-items:center;justify-content:space-between;margin-top:12px;color:#d5e1ff}
+		.simple-btn{height:44px;padding:0 18px;border:0;border-radius:10px;background:linear-gradient(135deg,#2d89ef,#56b0ff);color:#fff}
+		.simple-input::placeholder{color:#c7d6ff}
 		.simple-lang a img{margin-left:6px}
 	</style>
 </head>
