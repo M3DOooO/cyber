@@ -65,6 +65,7 @@ if ($db_ok) {
 $device_name = 'Unknown Device';
 $device_qr_pin = '';
 $device_qr_mode = 'single';
+$device_time_mode = 'time';
 $error_message = '';
 $success_message = '';
 $provided_pin = isset($_REQUEST['pin']) ? trim($_REQUEST['pin']) : '';
@@ -75,11 +76,12 @@ if ($db_ok) {
 }
 
 if ($db_ok && $device_id > 0) {
-    $r = mysql_query("SELECT `Device Name`,`qr_access_code`,`qr_order_mode` FROM devices WHERE ID='".$device_id."' LIMIT 1");
+    $r = mysql_query("SELECT `Device Name`,`qr_access_code`,`qr_order_mode`,`timetype` FROM devices WHERE ID='".$device_id."' LIMIT 1");
     if ($r && ($row = mysql_fetch_assoc($r))) {
         $device_name = $row['Device Name'];
         $device_qr_pin = isset($row['qr_access_code']) ? trim($row['qr_access_code']) : '';
         $device_qr_mode = isset($row['qr_order_mode']) ? trim($row['qr_order_mode']) : 'single';
+        $device_time_mode = isset($row['timetype']) ? trim($row['timetype']) : 'time';
     } else {
         $error_message = 'الجهاز غير موجود.';
     }
@@ -148,6 +150,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+if ($db_ok && $device_id > 0 && $device_qr_pin !== '' && $provided_pin === $device_qr_pin) {
+    if (isset($_GET['switch_mode'])) {
+        $next_mode = ($_GET['switch_mode'] === 'multi') ? 'multi' : 'single';
+        mysql_query("UPDATE devices SET qr_order_mode='".$next_mode."' WHERE ID='".$device_id."'");
+        $device_qr_mode = $next_mode;
+    }
+    if (isset($_GET['switch_time'])) {
+        $next_time = ($_GET['switch_time'] === 'unlimited') ? 'unlimited' : 'time';
+        mysql_query("UPDATE devices SET timetype='".$next_time."' WHERE ID='".$device_id."'");
+        $device_time_mode = $next_time;
+    }
+}
+
 ?>
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>طلب خارجي</title>
@@ -165,6 +180,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <input type="number" name="qty" min="1" max="50" value="1" style="width:120px;max-width:100%;padding:8px;margin-bottom:12px;box-sizing:border-box" placeholder="الكمية" required>
 <button type="submit">إرسال الطلب</button>
 </form>
+<div style="margin-top:12px;border-top:1px solid #ddd;padding-top:10px">
+<?php if ($device_qr_mode === 'single') { ?>
+<a href="device_order_qr.php?device_id=<?php echo (int)$device_id; ?>&pin=<?php echo urlencode($provided_pin); ?>&switch_mode=multi" style="display:block;background:#444;color:#fff;text-align:center;padding:8px;border-radius:6px;text-decoration:none;margin-bottom:8px">تحويل إلى Multi</a>
+<?php } else { ?>
+<a href="device_order_qr.php?device_id=<?php echo (int)$device_id; ?>&pin=<?php echo urlencode($provided_pin); ?>&switch_mode=single" style="display:block;background:#444;color:#fff;text-align:center;padding:8px;border-radius:6px;text-decoration:none;margin-bottom:8px">تحويل إلى Single</a>
+<?php } ?>
+
+<?php if ($device_time_mode === 'time') { ?>
+<a href="device_order_qr.php?device_id=<?php echo (int)$device_id; ?>&pin=<?php echo urlencode($provided_pin); ?>&switch_time=unlimited" style="display:block;background:#1d7f3f;color:#fff;text-align:center;padding:8px;border-radius:6px;text-decoration:none">تحويل الوقت إلى غير محدود</a>
+<?php } else { ?>
+<a href="device_order_qr.php?device_id=<?php echo (int)$device_id; ?>&pin=<?php echo urlencode($provided_pin); ?>&switch_time=time" style="display:block;background:#1d7f3f;color:#fff;text-align:center;padding:8px;border-radius:6px;text-decoration:none">تحويل الوقت إلى محدود</a>
+<?php } ?>
+</div>
 <?php if($success_message!=''){ ?><p class="ok"><?php echo $success_message;?></p><?php } ?>
 <?php if($error_message!=''){ ?><p class="err"><?php echo htmlspecialchars($error_message);?></p><?php } ?>
 </div></body></html>
