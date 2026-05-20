@@ -15,6 +15,20 @@ $H = $Hour;
 
 mysql_connect("$host", "$user", "$pass")or die("cannot connect");
 mysql_select_db("$db")or die("cannot select DB");
+@mysql_query("ALTER TABLE devices ADD COLUMN qr_access_code VARCHAR(20) NOT NULL DEFAULT ''");
+@mysql_query("ALTER TABLE devices ADD COLUMN qr_order_mode VARCHAR(10) NOT NULL DEFAULT 'single'");
+
+$qr_mode = isset($_GET['qr_mode']) ? $_GET['qr_mode'] : '';
+$qr_status = isset($_GET['qr_status']) ? $_GET['qr_status'] : '';
+if ($id > 0 && ($qr_mode === 'single' || $qr_mode === 'multi')) {
+	mysql_query("UPDATE `devices` SET `qr_order_mode` = '".mysql_real_escape_string($qr_mode)."' WHERE `id` = '$id'");
+}
+if ($id > 0 && ($qr_status === 'On' || $qr_status === 'finished')) {
+	mysql_query("UPDATE `devices` SET `Device Status` = '".mysql_real_escape_string($qr_status)."' WHERE `id` = '$id'");
+	if ($qr_status === 'finished') {
+		mysql_query("UPDATE `devices` SET `qr_access_code` = '' WHERE `id` = '$id'");
+	}
+}
 
 function ceil_to_five($amount)
 {
@@ -333,6 +347,25 @@ while($row = mysql_fetch_array($resulty))
 <tr>
 <td colspan="6"><a class="btn-setting" href="#" data-toggle="modal" data-target="#myModalxx"><img style="margin-left:10px; float:left;" src="img/app/buttons/stop.png" title="<?php echo $lang_335;?>" data-rel="tooltip"/></a>
 <a href="devices_ps.php?id=<?php echo $id;?>"><img style="margin:5px 10px 0 0; float:right;" src="img/app/devices/reload.png" width="45" height="45" title="<?php echo $lang_333;?>" data-rel="tooltip"></a></td>
+</tr>
+<?php
+$qr_info = mysql_query("SELECT `qr_access_code`,`qr_order_mode`,`Device Status` FROM devices WHERE id='$id' LIMIT 1");
+$qr_row = $qr_info ? mysql_fetch_assoc($qr_info) : array();
+$qr_code_now = isset($qr_row['qr_access_code']) ? $qr_row['qr_access_code'] : '';
+$qr_mode_now = isset($qr_row['qr_order_mode']) ? $qr_row['qr_order_mode'] : 'single';
+$qr_status_now = isset($qr_row['Device Status']) ? $qr_row['Device Status'] : '';
+?>
+<tr>
+<td colspan="6" style="background:#0f1e45;color:#fff;padding:10px">
+	<b>QR PIN:</b> <?php echo htmlspecialchars($qr_code_now); ?> |
+	<b>Mode:</b> <?php echo htmlspecialchars($qr_mode_now); ?> |
+	<b>Status:</b> <?php echo htmlspecialchars($qr_status_now); ?>
+	<br><br>
+	<a class="btn btn-mini btn-info" href="devices_ps.php?id=<?php echo $id; ?>&qr_mode=single">Single</a>
+	<a class="btn btn-mini btn-info" href="devices_ps.php?id=<?php echo $id; ?>&qr_mode=multi">Multi</a>
+	<a class="btn btn-mini btn-success" href="devices_ps.php?id=<?php echo $id; ?>&qr_status=On">فتح تايم</a>
+	<a class="btn btn-mini btn-danger" href="devices_ps.php?id=<?php echo $id; ?>&qr_status=finished">قفل تايم</a>
+</td>
 </tr>
 
 <tr>
