@@ -2,6 +2,14 @@
 include('includes/config.php');
 
 $db_ok = true;
+
+function normalize_int_digits($value)
+{
+    $value = trim((string)$value);
+    $value = strtr($value, array('٠'=>'0','١'=>'1','٢'=>'2','٣'=>'3','٤'=>'4','٥'=>'5','٦'=>'6','٧'=>'7','٨'=>'8','٩'=>'9'));
+    return (int)$value;
+}
+
 $conn = mysql_connect("$host", "$user", "$pass");
 if (!$conn) {
     $db_ok = false;
@@ -71,7 +79,7 @@ if ($db_ok && $device_id > 0) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $posted_type = isset($_POST['request_type']) ? trim($_POST['request_type']) : '';
-    $posted_qty = 1;
+    $posted_qty = isset($_POST['qty']) ? normalize_int_digits($_POST['qty']) : 1;
 
     if (!$db_ok) {
         $error_message = 'حصلت مشكلة في قاعدة البيانات. برجاء المحاولة مرة أخرى.';
@@ -133,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php } ?>
 </select>
 <label style="display:block;margin-bottom:6px">الكمية المطلوبة:</label>
-<input type="number" name="qty" min="1" max="50" value="1" style="width:100%;padding:10px;margin-bottom:12px" placeholder="الكمية" required>
+<input type="number" name="qty" min="1" max="50" value="1" style="width:120px;max-width:100%;padding:8px;margin-bottom:12px;box-sizing:border-box" placeholder="الكمية" required>
 <button type="submit">إرسال الطلب</button>
 </form>
 <?php if($success_message!=''){ ?><p class="ok"><?php echo $success_message;?></p><?php } ?>
