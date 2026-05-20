@@ -1,7 +1,5 @@
 <?php
 // QR page bootstrap fixes:
-// 1) define legacy variable expected by includes/config.php to avoid undefined-variable warnings
-// 2) keep visible error output for diagnosis without converting every warning to fatal exception
 if (!isset($mac)) {
     $mac = '';
 }
@@ -9,6 +7,40 @@ if (!isset($mac)) {
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
+
+$device_id = isset($_GET['device_id']) ? (int)$_GET['device_id'] : 0;
+$pin = isset($_REQUEST['pin']) ? trim($_REQUEST['pin']) : '';
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $pin === '') {
+?>
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>دخول الطلبات</title>
+    <style>
+        body{font-family:tahoma;direction:rtl;padding:20px;background:#f6f8fb}
+        .box{max-width:360px;margin:40px auto;border:1px solid #ddd;background:#fff;padding:18px;border-radius:10px}
+        input,button{width:100%;padding:11px;box-sizing:border-box}
+        input{margin:10px 0;border:1px solid #ccc;border-radius:8px}
+        button{border:0;border-radius:8px;background:#2d89ef;color:#fff}
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h3 style="margin-top:0">ادخل الرقم السري للطلبات</h3>
+        <form method="get" action="device_order_qr.php">
+            <input type="hidden" name="device_id" value="<?php echo (int)$device_id; ?>">
+            <input type="text" name="pin" placeholder="اكتب الرقم السري" required autofocus>
+            <button type="submit">دخول</button>
+        </form>
+    </div>
+</body>
+</html>
+<?php
+    exit;
+}
 
 register_shutdown_function(function () {
     $error = error_get_last();
