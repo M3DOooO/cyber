@@ -12,6 +12,7 @@ if (!$conn || !mysql_select_db("$db")) {
     echo json_encode(array('ok' => false, 'error' => 'db_connection'), JSON_UNESCAPED_UNICODE);
     exit;
 }
+mysql_set_charset('utf8mb4');
 $create_ok = mysql_query("CREATE TABLE IF NOT EXISTS qr_device_requests (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     device_id INT NOT NULL,

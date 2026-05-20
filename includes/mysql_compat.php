@@ -39,6 +39,17 @@ if (!function_exists('mysql_connect')) {
         return $link;
     }
 
+
+    function mysql_set_charset($charset, $link_identifier = null)
+    {
+        $link = $link_identifier ?: ($GLOBALS['__mysql_compat_last_connection'] ?? null);
+        if (!$link) {
+            return false;
+        }
+
+        return mysqli_set_charset($link, $charset);
+    }
+
     function mysql_select_db($database_name, $link_identifier = null)
     {
         $link = $link_identifier ?: ($GLOBALS['__mysql_compat_last_connection'] ?? null);

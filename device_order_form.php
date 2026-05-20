@@ -7,6 +7,8 @@ if (!$conn) {
     $db_ok = false;
 } elseif (!mysql_select_db("$db")) {
     $db_ok = false;
+} else {
+    mysql_set_charset('utf8mb4');
 }
 
 if ($db_ok) {
