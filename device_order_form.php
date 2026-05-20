@@ -7,6 +7,8 @@ if (!$conn) {
     $db_ok = false;
 } elseif (!mysql_select_db("$db")) {
     $db_ok = false;
+} else {
+    mysql_set_charset('utf8mb4');
 }
 
 if ($db_ok) {
@@ -124,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <select name="request_type" style="width:100%;padding:10px;margin-bottom:12px" required>
 <option value="">-- اختار المنتج --</option>
 <?php foreach($stock_items as $it){ ?>
-<option value="<?php echo htmlspecialchars($it['name']);?>"><?php echo htmlspecialchars($it['name']);?> (متاح: <?php echo (int)$it['qty_left'];?>)</option>
+<option value="<?php echo htmlspecialchars($it['name']);?>"><?php echo htmlspecialchars($it['name']);?></option>
 <?php } ?>
 </select>
 <input type="number" name="qty" min="1" max="50" value="1" style="width:100%;padding:10px;margin-bottom:12px" placeholder="الكمية" required>
