@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <select name="request_type" style="width:100%;padding:10px;margin-bottom:12px" required>
 <option value="">-- اختار المنتج --</option>
 <?php foreach($stock_items as $it){ ?>
-<option value="<?php echo htmlspecialchars($it['name']);?>"><?php echo htmlspecialchars($it['name']);?> (متاح: <?php echo (int)$it['qty_left'];?>)</option>
+<option value="<?php echo htmlspecialchars($it['name']);?>"><?php echo htmlspecialchars($it['name']);?></option>
 <?php } ?>
 </select>
 <button type="submit">إرسال الطلب</button>

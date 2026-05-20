@@ -247,7 +247,7 @@ if($add_funds == 'True')
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script type="text/javascript">
 // Popup window code
 // var url = document.getElementById("www.google.com");
