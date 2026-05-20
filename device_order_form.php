@@ -64,7 +64,7 @@ if ($db_ok && $device_id > 0) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $posted_type = isset($_POST['request_type']) ? trim($_POST['request_type']) : '';
-    $posted_qty = isset($_POST['qty']) ? (int)$_POST['qty'] : 1;
+    $posted_qty = 1;
 
     if (!$db_ok) {
         $error_message = 'حصلت مشكلة في قاعدة البيانات. برجاء المحاولة مرة أخرى.';
@@ -73,8 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($posted_type == '') {
         $error_message = 'من فضلك اختار نوع الطلب.';
     } else {
-        if ($posted_qty < 1) { $posted_qty = 1; }
-        if ($posted_qty > 50) { $posted_qty = 50; }
         $request_type = mysql_real_escape_string($posted_type);
         $safe_name = mysql_real_escape_string($device_name);
         $insert = mysql_query("INSERT INTO qr_device_requests (device_id,device_name,request_type,qty,status,created_at) VALUES ('".$device_id."','$safe_name','$request_type','".$posted_qty."','new',NOW())");
@@ -124,10 +122,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <select name="request_type" style="width:100%;padding:10px;margin-bottom:12px" required>
 <option value="">-- اختار المنتج --</option>
 <?php foreach($stock_items as $it){ ?>
-<option value="<?php echo htmlspecialchars($it['name']);?>"><?php echo htmlspecialchars($it['name']);?> (متاح: <?php echo (int)$it['qty_left'];?>)</option>
+<option value="<?php echo htmlspecialchars($it['name']);?>"><?php echo htmlspecialchars($it['name']);?></option>
 <?php } ?>
 </select>
-<input type="number" name="qty" min="1" max="50" value="1" style="width:100%;padding:10px;margin-bottom:12px" placeholder="الكمية" required>
 <button type="submit">إرسال الطلب</button>
 </form>
 <?php if($success_message!=''){ ?><p class="ok"><?php echo $success_message;?></p><?php } ?>
