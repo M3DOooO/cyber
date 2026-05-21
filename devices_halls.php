@@ -91,6 +91,7 @@ mysql_select_db("$db")or die("cannot select DB");
 		      mysql_query("UPDATE `ps_orders` set `status` = 'yes'    WHERE `ps_id` = '$endid'  AND `session_id` ='$endsess';"); 
     mysql_query("UPDATE `ps_orders` set `shift` = '$current_shift'    WHERE   `session_id` ='$endsess';"); 
     mysql_query("UPDATE `ps_orders` set `casheer` = '$casheer'    WHERE `ps_id` = '$endid' AND `session_id` ='$endsess';");
+    mysql_query("UPDATE `ps_orders` set `day` = '$shift_day', `month` = '$shift_month', `year` = '$Year' WHERE `session_id` ='$endsess';");
 	  }
 
  ?>
