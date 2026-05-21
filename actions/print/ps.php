@@ -1,4 +1,4 @@
-﻿<?php session_start();
+<?php session_start();
  if( !isset($_SESSION['ps_user']) )
  {
 	echo "<script>location='../../devices.php'</script>";
@@ -320,7 +320,12 @@ $last = $tot - $ddd2;
 ?></font><?php 
 mysql_connect("$host", "$user", "$pass") or die(mysql_error()); 
 mysql_select_db("$db") or die(mysql_error()); 
-mysql_query("UPDATE `reports` set `status` = 'done'  WHERE `session_id` = '$Sess';"); 
+$closeDay = idate('d');
+$closeMonth = idate('m');
+$closeYear = idate('Y');
+$closeHour = idate('H');
+mysql_query("UPDATE `reports` set `day` = '$closeDay', `month` = '$closeMonth', `year` = '$closeYear', `hour` = '$closeHour', `status` = 'done' WHERE `session_id` = '$Sess';"); 
+mysql_query("UPDATE `ps_orders` set `day` = '$closeDay', `month` = '$closeMonth', `year` = '$closeYear', `hour` = '$closeHour' WHERE `session_id` = '$Sess';"); 
 ?>
 
 </body>
