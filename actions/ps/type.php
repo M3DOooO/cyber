@@ -1,4 +1,4 @@
-﻿<?php session_start();
+<?php session_start();
 if( !isset($_SESSION['ps_user']) )
 {
 	include('../../login.php');
@@ -78,14 +78,14 @@ if(isset($change))
 	mysql_query("UPDATE `reports` set `shift` = '$current_shift'  WHERE `session_id` = '$change_sess' AND pc_id = '$change_id' AND End_hour = '-';"); 
 	mysql_query("UPDATE `reports` set `End_hour` = $H  WHERE `session_id` = '$change_sess';"); 
 	mysql_query("UPDATE `devices` set `type` = '$change_ty'  WHERE `id` = '$change_id';");  
-	mysql_query("UPDATE `devices` set `day` = '$shift_day'  WHERE `id` = '$change_id';");  
+	mysql_query("UPDATE `devices` set `day` = '$Day'  WHERE `id` = '$change_id';");  
 	mysql_query("UPDATE `devices` set `day2` = '$Day2'  WHERE `id` = '$change_id';");  
-	mysql_query("UPDATE `devices` set `month` = '$shift_month'  WHERE `id` = '$change_id';");  
+	mysql_query("UPDATE `devices` set `month` = '$Month'  WHERE `id` = '$change_id';");  
 	mysql_query("UPDATE `devices` set `year` = '$Year'  WHERE `id` = '$change_id';");  
 	mysql_query("UPDATE `devices` set `hour` = $H  WHERE `id` = '$change_id';");  
 	mysql_query("UPDATE `devices` set `minute` = '$Minute'  WHERE `id` = '$change_id';");  
 	mysql_query("UPDATE `devices` set `second` = '$Second'  WHERE `id` = '$change_id';");  
-	mysql_query("INSERT INTO `reports` (`type`, `pc_id`, `Start_hour` ,`Start_minute`,`day`,`day2`,`month`,`year`,`Start_second`,`session_id`,`casheer`) VALUES ('$change_ty', '$change_id','$H','$Minute','$shift_day','$Day2','$shift_month','$Year','$Second','$change_sess','$casheer');"); 
+	mysql_query("INSERT INTO `reports` (`type`, `pc_id`, `Start_hour` ,`Start_minute`,`day`,`day2`,`month`,`year`,`Start_second`,`session_id`,`casheer`) VALUES ('$change_ty', '$change_id','$H','$Minute','$Day','$Day2','$Month','$Year','$Second','$change_sess','$casheer');"); 
 
 }
  

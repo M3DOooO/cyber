@@ -65,7 +65,9 @@ if(isset($var1))
 	}
 	mysql_connect("$host", "$user", "$pass") or die(mysql_error()); 
 	mysql_select_db("$db") or die(mysql_error()); 
-	mysql_query("INSERT INTO `ps_orders` (`catagory`, `sub_cat`,`name`, `price`, `num` , `ps_id` ,`session_id`,`day`,`month`,`year`,`shift`,`hour` ) VALUES ('$var3', '$var4', '$var1','$total','$var2','$var6','$var7','$shift_day','$shift_month','$Year','$current_shift','$Hour');"); 
+	$today_day = idate('d');
+	$today_month = idate('m');
+	mysql_query("INSERT INTO `ps_orders` (`catagory`, `sub_cat`,`name`, `price`, `num` , `ps_id` ,`session_id`,`day`,`month`,`year`,`shift`,`hour` ) VALUES ('$var3', '$var4', '$var1','$total','$var2','$var6','$var7','$today_day','$today_month','$Year','$current_shift','$Hour');"); 
 	mysql_query("UPDATE `stock` set `sold` = '$new'  WHERE `name` = '$var1';"); 
 } 
 $Item = $_GET['Item'];
