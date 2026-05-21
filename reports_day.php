@@ -16,10 +16,10 @@ while($row = mysql_fetch_array($result))
 	$usern = $row['type'];
 }
 if($usern != 1 ){echo "<script>location='devices.php'</script>";}$id = $_GET['id']; 
-$today =  $shift_day;
-$this_month =  $shift_month;
-$Month = $shift_month;
-$Day = $shift_day;	
+$today = idate('d');
+$this_month = idate('m');
+$Month = $this_month;
+$Day = $today;	
 $Year = idate('Y');
 
 $Rday = isset($_GET['se_day']) ? (int)$_GET['se_day'] : (isset($_GET['day']) ? (int)$_GET['day'] : null);
