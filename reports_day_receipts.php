@@ -1,4 +1,4 @@
-﻿<?php session_start();
+<?php session_start();
  if( !isset($_SESSION['ps_user']) )
  {
 	include('login.php');
@@ -99,7 +99,7 @@ while($row = mysql_fetch_array($resulty)){
 $items = $row['SUM(money)'];  
  }
 // To connect to the database
-$result = mysql_query("SELECT *,SUM(money) FROM `reports` WHERE day = $rday AND month = $rmonth AND year = $ryear AND End_hour != '-' AND status = 'done' GROUP BY session_id"); 
+$result = mysql_query("SELECT *, SUM(money) as sum_money_rows, SUM(total) as sum_total_rows, MIN(Start_hour*60 + Start_minute) as min_start_minute, MAX(End_hour*60 + End_minute) as max_end_minute FROM `reports` WHERE day = $rday AND month = $rmonth AND year = $ryear AND End_hour != '-' AND status = 'done' GROUP BY session_id"); 
  ?><thead>
 <tr>
 								  <th><?php echo $lang_149;?></th>
@@ -140,10 +140,16 @@ while($rowt3 = mysql_fetch_array($resultki3))
 	$discount = $rowt3['SUM(discount2)']+ $rowt3['SUM(discount_amount)'];
 }
 	$se_se = $row['session_id'];
-$tom = $row['total'];
-$hr = floor($tom / 3600)%24;
+$tom = (int)$row['sum_total_rows'];
+$hr = floor($tom / 3600);
 $mr = floor($tom / 60)%60;
 $sr = ($tom % 60);
+$start_total_minutes = (int)$row['min_start_minute'];
+$end_total_minutes = (int)$row['max_end_minute'];
+$start_hour = floor($start_total_minutes / 60);
+$start_minute = $start_total_minutes % 60;
+$end_hour = floor($end_total_minutes / 60);
+$end_minute = $end_total_minutes % 60;
 $shift_check = $row['shift'];
 // $resultki3 = mysql_query("SELECT SUM(discount2),SUM(discount_amount) FROM `reports` WHERE `session_id` = '$se_se'"); 
 $total = $sum_money + $sum_items - $discount + $row['tax'] + $row['service'];
@@ -171,8 +177,8 @@ $thetype = $row['type'];
    ?>
    </td><?php    echo "<td>" . $shift_check2 . "</td>";
    echo "<td>" . $row['year'] ."/". $row['month'] . "/" . $row['day']. "</td>";
-   echo "<td>" . $row['Start_hour'].":" .$row['Start_minute']."</td>";
-   echo "<td>" . $row['End_hour'].":" .$row['End_minute']."</td>";
+   echo "<td>" . sprintf('%02d', $start_hour).":" .sprintf('%02d', $start_minute)."</td>";
+   echo "<td>" . sprintf('%02d', $end_hour).":" .sprintf('%02d', $end_minute)."</td>";
 ?><td><?php  echo $hr; ?>:<?php  echo $mr; ?>:<?php  echo $sr; ?></td><?php 
      echo "<td>" . $sum_items ." ".$lang_100. "</td>";
      echo "<td>" . $sum_money ." ".$lang_100. "</td>";
