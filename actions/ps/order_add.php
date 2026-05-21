@@ -1,4 +1,4 @@
-﻿<?php session_start();
+<?php session_start();
  if( !isset($_SESSION['ps_user']) )
  {
 	echo "<script>location='../../devices.php'</script>";
@@ -82,14 +82,16 @@ while($row = mysql_fetch_array($result))
     $itcost = $itcosth * $qty;
     $new = $we_have + $qty;
  	$total = ($qty * $price);
-  	$Year = idate('Y');
+  	$Day = idate('d');
+	$Month = idate('m');
+	$Year = idate('Y');
  
     mysql_connect("$host", "$user", "$pass") or die(mysql_error()); 
     mysql_select_db("$db") or die(mysql_error()); 
 	if ($qty > 0)
 	{
 			// echo $name ;
-    mysql_query("INSERT INTO `ps_orders` (`catagory`, `sub_cat`,`name`, `price`, `num` , `ps_id` ,`session_id`,`day`,`month`,`year`,`hour`) VALUES ('$catagory', '$sub_cat', '$name','$total','$qty','$ps_id','$session','$shift_day','$shift_month','$Year','$Hour');"); 
+    mysql_query("INSERT INTO `ps_orders` (`catagory`, `sub_cat`,`name`, `price`, `num` , `ps_id` ,`session_id`,`day`,`month`,`year`,`hour`) VALUES ('$catagory', '$sub_cat', '$name','$total','$qty','$ps_id','$session','$Day','$Month','$Year','$Hour');"); 
     mysql_query("UPDATE `stock` set `sold` = '$new'  WHERE `name` = '$name' AND date = '$mindate';"); 
 
 	 mysql_query("UPDATE `stock` set `sold` = '$new'  WHERE `name` = '$var1' AND date = '$mindate';"); 
