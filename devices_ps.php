@@ -357,18 +357,6 @@ $qr_code_now = isset($qr_row['qr_access_code']) ? $qr_row['qr_access_code'] : ''
 $qr_mode_now = isset($qr_row['qr_order_mode']) ? $qr_row['qr_order_mode'] : 'single';
 $qr_status_now = isset($qr_row['Device Status']) ? $qr_row['Device Status'] : '';
 ?>
-<tr>
-<td colspan="6" style="background:#0f1e45;color:#fff;padding:10px">
-	<b>QR PIN:</b> <?php echo htmlspecialchars($qr_code_now); ?> |
-	<b>Mode:</b> <?php echo htmlspecialchars($qr_mode_now); ?> |
-	<b>Status:</b> <?php echo htmlspecialchars($qr_status_now); ?>
-	<br><br>
-	<a class="btn btn-mini btn-info" href="devices_ps.php?id=<?php echo $id; ?>&qr_mode=single">Single</a>
-	<a class="btn btn-mini btn-info" href="devices_ps.php?id=<?php echo $id; ?>&qr_mode=multi">Multi</a>
-	<a class="btn btn-mini btn-success" href="devices_ps.php?id=<?php echo $id; ?>&qr_status=On">فتح تايم</a>
-	<a class="btn btn-mini btn-danger" href="devices_ps.php?id=<?php echo $id; ?>&qr_status=finished">قفل تايم</a>
-</td>
-</tr>
 
 <tr>
 <th colspan="6" style="border-top:1px solid #33b5e5;border-bottom:1px solid #808080;" ><center><h3><font color="#33b5e5"><?php echo $lang_334;?></font></h3></center></th>
