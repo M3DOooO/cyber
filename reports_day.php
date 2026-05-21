@@ -1,4 +1,4 @@
-﻿<?php session_start();
+<?php session_start();
  if( !isset($_SESSION['ps_user']) )
  {
 	include('login.php');
@@ -16,16 +16,16 @@ while($row = mysql_fetch_array($result))
 	$usern = $row['type'];
 }
 if($usern != 1 ){echo "<script>location='devices.php'</script>";}$id = $_GET['id']; 
-$today =  $shift_day;
-$this_month =  $shift_month;
-$Month = $shift_month;
-$Day = $shift_day;	
+$today = idate('d');
+$this_month = idate('m');
+$Month = $this_month;
+$Day = $today;	
 $Year = idate('Y');
 
-$Rday = $_GET['se_day'];
-$Rmonth = $_GET['se_month'];
-$Ryear = $_GET['se_year'];
-if(isset($Rday)||isset($Rmonth)||isset($Ryear))
+$Rday = isset($_GET['se_day']) ? (int)$_GET['se_day'] : (isset($_GET['day']) ? (int)$_GET['day'] : null);
+$Rmonth = isset($_GET['se_month']) ? (int)$_GET['se_month'] : (isset($_GET['month']) ? (int)$_GET['month'] : null);
+$Ryear = isset($_GET['se_year']) ? (int)$_GET['se_year'] : (isset($_GET['year']) ? (int)$_GET['year'] : null);
+if($Rday && $Rmonth && $Ryear)
 		{
   $today =  $Rday;
   $this_month =  $Rmonth;
@@ -112,7 +112,7 @@ function newPopup2(url) {
 				</div>
 			</noscript>
 			<?php 
-			if(isset($Rday)||isset($Rmonth)||isset($Ryear))
+			if($Rday && $Rmonth && $Ryear)
 		{
   $today =  $Rday;
   $this_month =  $Rmonth;
