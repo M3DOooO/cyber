@@ -23,6 +23,8 @@ $Day = idate('d');
 
 	mysql_connect("$host", "$user", "$pass") or die(mysql_error()); 
 	mysql_select_db("$db") or die(mysql_error()); 
+	$mysql_tz_offset = date('P');
+	mysql_query("SET time_zone = '" . $mysql_tz_offset . "'") or die(mysql_error());
 	$sql="SELECT * FROM config";
 	$result=mysql_query($sql);
 	while($row = mysql_fetch_array($result))
